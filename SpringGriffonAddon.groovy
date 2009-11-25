@@ -28,6 +28,9 @@ class SpringGriffonAddon {
         // 1. fetch all addons interested in Spring features
         //  - app.applicationContext.springAddon.addons << this (??)
         // 2. for each addon:
-        //  - call doWithSpring
+        //  - call doWithSpring()
+        // 3. refresh appCtx (if needed) ?
+        // 4. for each addon:
+        //  - call whenSpringReady()
     }
 }

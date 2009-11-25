@@ -25,3 +25,5 @@ if (!addonIsSet1) {
 root.'SpringGriffonAddon'.addon=true
 ''')
 }
+
+ant.mkdir(dir: "${basedir}/src/spring")

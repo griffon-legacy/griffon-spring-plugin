@@ -1,6 +1,7 @@
 <plugin name='spring' version='0.1-SNAPSHOT' jdk='1.5'>
-  <author>Your name</author>
-  <title>Plugin summary/headline</title>
+  <author>Andres Almiray</author>
+  <authorEmail>aalmiray@users.sourceforge.net</authorEmail>
+  <title>Spring framework libraries and helpers</title>
   <documentation>http://griffon.codehaus.org/Spring+Plugin</documentation>
   <dependencies />
 </plugin>
