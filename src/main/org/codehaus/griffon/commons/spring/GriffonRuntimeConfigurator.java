@@ -126,6 +126,10 @@ public class GriffonRuntimeConfigurator implements ApplicationContextAware {
         return configure(springConfig, loadExternalBeans);
     }
 
+    public ApplicationContext configure(DefaultRuntimeSpringConfiguration springConfig) {
+        return configure(springConfig, true);
+    }
+
     public ApplicationContext configure(DefaultRuntimeSpringConfiguration springConfig, boolean loadExternalBeans) {
         Assert.notNull(application);
 

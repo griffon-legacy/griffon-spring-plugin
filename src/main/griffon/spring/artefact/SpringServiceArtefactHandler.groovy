@@ -17,16 +17,29 @@
 package griffon.spring.artefact
 
 import griffon.core.ArtefactInfo
-import griffon.core.ServiceArtefactHandler
+import griffon.core.ArtefactHandlerAdapter
+import grails.spring.BeanBuilder
 
 /**
  * @author Andres Almiray (aalmiray)
  */
-class SpringServiceArtefactHandler extends ServiceArtefactHandler {
+class SpringServiceArtefactHandler extends ArtefactHandlerAdapter {
+    SpringServiceArtefactHandler() {
+        super("service")
+    }
+
     void initialize(ArtefactInfo[] artefacts) {
         super.initialize(artefacts)
-        artefacts.each { artefact ->
-            app.applicationContext.registerSingleton(artefact.simpleName, artefact.klass)
+        if(!artefacts) return
+        BeanBuilder beanBuilder = new BeanBuilder(app.applicationContext, app.class.classLoader)
+        beanBuilder.beans { 
+            artefacts.each { artefact ->
+                "${artefact.simpleName}"(artefact.klass) { bean ->
+                    bean.scope = "singleton"
+                    bean.autowire = "byName"
+                }
+            }
         }
+        beanBuilder.registerBeans(app.applicationContext)
     }
 }
