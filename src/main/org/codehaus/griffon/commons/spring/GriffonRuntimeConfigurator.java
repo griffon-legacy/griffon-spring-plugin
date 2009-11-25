@@ -122,9 +122,14 @@ public class GriffonRuntimeConfigurator implements ApplicationContextAware {
     }
 
     public ApplicationContext configure(boolean loadExternalBeans) {
+        DefaultRuntimeSpringConfiguration springConfig = new DefaultRuntimeSpringConfiguration(parent, application.getClass().getClassLoader());
+        return configure(springConfig, loadExternalBeans);
+    }
+
+    public ApplicationContext configure(DefaultRuntimeSpringConfiguration springConfig, boolean loadExternalBeans) {
         Assert.notNull(application);
 
-        DefaultRuntimeSpringConfiguration springConfig = new DefaultRuntimeSpringConfiguration(parent, application.getClass().getClassLoader());
+        springConfig = springConfig != null ? springConfig : new DefaultRuntimeSpringConfiguration(parent, application.getClass().getClassLoader());
 //        if (!this.pluginManager.isInitialised()) {
 //            this.pluginManager.loadPlugins();
 //        }

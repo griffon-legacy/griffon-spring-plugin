@@ -27,3 +27,18 @@ root.'SpringGriffonAddon'.addon=true
 }
 
 ant.mkdir(dir: "${basedir}/src/spring")
+
+def checkConfigOptionIsSet = { where, option ->
+   boolean optionIsSet = false
+   where.each { key, value ->
+       optionIsSet = optionIsSet || option == key
+   }
+   optionIsSet
+}
+
+def appConfig = configSlurper.parse(new File("${basedir}/griffon-app/conf/Application.groovy").toURL())
+if(!checkConfigOptionIsSet(appConfig, "griffon.basic_injection.disable")) {
+    new File("${basedir}/griffon-app/conf/Application.groovy").append("""
+griffon.basic_injection.disable = true
+""")
+}

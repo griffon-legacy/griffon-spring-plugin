@@ -1,4 +1,5 @@
 import griffon.util.IGriffonApplication
+import griffon.spring.artefact.SpringServiceArtefactHandler
 import org.codehaus.griffon.commons.spring.GriffonRuntimeConfigurator
 import org.codehaus.griffon.commons.spring.DefaultRuntimeSpringConfiguration
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
@@ -11,11 +12,12 @@ class SpringGriffonAddon {
         def configurator = new GriffonRuntimeConfigurator(app, null)
         def springConfig = new DefaultRuntimeSpringConfiguration(null, app.class.classLoader)
         GriffonRuntimeConfigurator.loadExternalSpringConfig(springConfig, app.class.classLoader)
-        app.metaClass.applicationContext = configurator.configure()
+        def applicationContext = configurator.configure()
+//        applicationContext.setProperty("app", app)
+        app.metaClass.applicationContext = applicationContext
         app.addApplicationEventListener(this)
 
-        // TODO
-        // 1. register SpringServiceArtefactHandler
+        app.artefactManager.registerArtefactHandler(new SpringServiceArtefactHandler())
     }
 
     def onNewInstance = { klass, type, instance ->
