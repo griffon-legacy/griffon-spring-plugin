@@ -1,7 +1,7 @@
 import grails.spring.BeanBuilder
 
 import griffon.util.IGriffonApplication
-import griffon.spring.artefact.SpringServiceArtefactHandler
+import griffon.spring.artifact.SpringServiceArtifactHandler
 import griffon.spring.factory.support.GriffonApplicationFactoryBean
 import org.codehaus.griffon.commons.spring.GriffonApplicationContext
 import org.codehaus.griffon.commons.spring.GriffonRuntimeConfigurator
@@ -32,7 +32,7 @@ class SpringGriffonAddon {
         app.metaClass.applicationContext = applicationContext
         app.addApplicationEventListener(this)
 
-        app.artefactManager.registerArtefactHandler(new SpringServiceArtefactHandler())
+        app.artifactManager.registerArtifactHandler(new SpringServiceArtifactHandler())
     }
 
     def addonPostInit(app) {

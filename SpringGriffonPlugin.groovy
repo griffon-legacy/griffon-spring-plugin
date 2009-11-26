@@ -7,7 +7,7 @@ class SpringGriffonPlugin {
     def authorEmail = "aalmiray@users.sourceforge.net"
     def title = "Spring framework libraries and helpers"
     def description = '''\\
-Brings the Spring framewoek libraries and some helper classes.
+Brings the Spring framework libraries and some helper classes.
 '''
 
     // URL to the plugin's documentation
