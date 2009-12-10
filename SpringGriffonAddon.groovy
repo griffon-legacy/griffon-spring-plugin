@@ -1,3 +1,19 @@
+/*
+ * Copyright 2009 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import grails.spring.BeanBuilder
 
 import griffon.util.IGriffonApplication
@@ -8,22 +24,21 @@ import org.codehaus.griffon.commons.spring.GriffonRuntimeConfigurator
 import org.codehaus.griffon.commons.spring.DefaultRuntimeSpringConfiguration
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 
+/**
+ * @author Andres Almiray
+ */
 class SpringGriffonAddon {
     IGriffonApplication app
     private final List addons = []
-    private BeanBuilder beanBuilder
 
     def addonInit(appInstance) {
         app = appInstance
         
-        def rootAppCtx = new GriffonApplicationContext()
-        beanBuilder = new BeanBuilder(rootAppCtx, app.class.classLoader)
-        registerBeans(rootAppCtx) {
+        def rootAppCtx = registerBeans {
             'app'(GriffonApplicationFactoryBean) {
                 application = appInstance
             }
         }
-        rootAppCtx.refresh()
 
         def configurator = new GriffonRuntimeConfigurator(app, rootAppCtx)
         def springConfig = new DefaultRuntimeSpringConfiguration(rootAppCtx, app.class.classLoader)
@@ -64,9 +79,17 @@ class SpringGriffonAddon {
         } 
     }
 
-    private void registerBeans(appCtx, Closure beans) {
+    private registerBeans(Closure beans) {
+        def appCtx = new GriffonApplicationContext()
+        appCtx.refresh()
+        registerBeans(appCtx, beans)
+    }
+
+    private registerBeans(appCtx, Closure beans) {
+        def beanBuilder = new BeanBuilder(appCtx, app.class.classLoader)
         beanBuilder.beans(beans)
         beanBuilder.registerBeans(appCtx)
+        beanBuilder.createApplicationContext()
     }
 
     private void springReady(addon) {
