@@ -1,5 +1,5 @@
 /*
-* Copyright 2009 the original author or authors.
+* Copyright 2009-2010 the original author or authors.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
 
 package griffon.spring.factory.support;
 
-import griffon.util.IGriffonApplication;
+import griffon.core.GriffonApplication;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
- * @author Andres Almiray (aalmiray)
+ * @author Andres Almiray
  */
 public class GriffonApplicationFactoryBean implements FactoryBean {
-    private IGriffonApplication application;
+    private GriffonApplication application;
 
-    public void setApplication(IGriffonApplication application) {
+    public void setApplication(GriffonApplication application) {
         this.application = application;
     }
 
@@ -34,7 +34,7 @@ public class GriffonApplicationFactoryBean implements FactoryBean {
     }
 
     public Class getObjectType() {
-        return IGriffonApplication.class;
+        return GriffonApplication.class;
     }
 
     public boolean isSingleton() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 the original author or authors.
+ * Copyright 2009-2010 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 import grails.spring.BeanBuilder
 
-import griffon.util.IGriffonApplication
+import griffon.core.GriffonApplication
 import griffon.spring.artifact.SpringServiceArtifactHandler
 import griffon.spring.factory.support.GriffonApplicationFactoryBean
 import org.codehaus.griffon.commons.spring.GriffonApplicationContext
@@ -28,8 +28,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory
  * @author Andres Almiray
  */
 class SpringGriffonAddon {
-    IGriffonApplication app
-    private final List addons = []
+    GriffonApplication app
 
     def addonInit(appInstance) {
         app = appInstance
@@ -45,26 +44,22 @@ class SpringGriffonAddon {
         GriffonRuntimeConfigurator.loadExternalSpringConfig(springConfig, app.class.classLoader)
         def applicationContext = configurator.configure(springConfig)
         app.metaClass.applicationContext = applicationContext
-        app.addApplicationEventListener(this)
 
         app.artifactManager.registerArtifactHandler(new SpringServiceArtifactHandler())
     }
 
-    def addonPostInit(app) {
-        addons.each { withSpring(it) }
-        addons.each { springReady(it) }
-    }
-
     // ================== EVENTS =================
 
-    def onNewInstance = { klass, type, instance ->
-        app.applicationContext.getAutowireCapableBeanFactory()
+    def events = [
+        NewInstance: { klass, type, instance ->
+            app.applicationContext.getAutowireCapableBeanFactory()
                 .autowireBeanProperties(instance, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false)
-    }
-
-    def onSpringAddon = { addon ->
-        if(addon) addons << addon
-    }
+        },
+        LoadAddonsEnd: { app, addons ->
+            addons.each { withSpring(it.value) }
+            addons.each { springReady(it.value) }
+        }
+    ]
 
     // =================== IMPL ==================
 

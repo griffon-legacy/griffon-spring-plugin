@@ -1,5 +1,5 @@
 /*
-* Copyright 2004-2009 the original author or authors.
+* Copyright 2004-2010 the original author or authors.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -22,13 +22,8 @@ import groovy.lang.Closure;
 import groovy.lang.Script;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import griffon.util.IGriffonApplication;
-// import org.codehaus.groovy.grails.commons.IGriffonApplication;
+import griffon.core.GriffonApplication;
 // import org.codehaus.groovy.grails.exceptions.GrailsConfigurationException;
-// import org.codehaus.groovy.grails.orm.hibernate.ConfigurableLocalSessionFactoryBean;
-// import org.codehaus.groovy.grails.plugins.DefaultGrailsPluginManager;
-// import org.codehaus.groovy.grails.plugins.GrailsPluginManager;
-// import org.codehaus.groovy.grails.plugins.PluginManagerHolder;
 import org.codehaus.groovy.grails.commons.spring.RuntimeSpringConfiguration;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -41,36 +36,26 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-// import org.springframework.mock.web.MockServletContext;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-// import org.springframework.web.context.WebApplicationContext;
 
-// import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 /**
- * A class that handles the runtime configuration of the Grails ApplicationContext
+ * A class that handles the runtime configuration of the Griffon ApplicationContext.<p>
+ * Tweaked from its Grails counterpart.
  *
  * @author Graeme Rocher
  * @since 0.3
  */
 public class GriffonRuntimeConfigurator implements ApplicationContextAware {
     public static final String BEAN_ID = "griffonConfigurator";
-//    public static final String GRAILS_URL_MAPPINGS = "grailsUrlMappings";
     public static final String SPRING_RESOURCES_XML = "/spring/resources.xml";
     public static final String SPRING_RESOURCES_GROOVY = "/spring/resources.groovy";
     public static final String SPRING_RESOURCES_CLASS = "resources";
-//    public static final String OPEN_SESSION_IN_VIEW_INTERCEPTOR_BEAN = "openSessionInViewInterceptor";
-//    public static final String TRANSACTION_MANAGER_BEAN = "transactionManager";
-//    public static final String HIBERNATE_PROPERTIES_BEAN = "hibernateProperties";
-//    public static final String DIALECT_DETECTOR_BEAN = "dialectDetector";
-//    public static final String SESSION_FACTORY_BEAN = "sessionFactory";
-//    public static final String DATA_SOURCE_BEAN = "dataSource";
     public static final String MESSAGE_SOURCE_BEAN = "messageSource";
-//    public static final String MULTIPART_RESOLVER_BEAN = "multipartResolver";
     public static final String EXCEPTION_HANDLER_BEAN = "exceptionHandler";
     public static final String CUSTOM_EDITORS_BEAN = "customEditors";
     public static final String CLASS_EDITOR_BEAN = "classEditor";
@@ -78,38 +63,19 @@ public class GriffonRuntimeConfigurator implements ApplicationContextAware {
 
     private static final Log LOG = LogFactory.getLog(GriffonRuntimeConfigurator.class);
 
-    private IGriffonApplication application;
+    private GriffonApplication application;
     private ApplicationContext parent;
-//    private boolean parentDataSource;
-//    private GrailsPluginManager pluginManager;
     private boolean loadExternalPersistenceConfig;
     private static final String DEVELOPMENT_SPRING_RESOURCES_XML = "file:./griffon-app/conf/spring/resources.xml";
 
-    public GriffonRuntimeConfigurator(IGriffonApplication application) {
+    public GriffonRuntimeConfigurator(GriffonApplication application) {
         this(application, null);
     }
 
-    public GriffonRuntimeConfigurator(IGriffonApplication application, ApplicationContext parent) {
+    public GriffonRuntimeConfigurator(GriffonApplication application, ApplicationContext parent) {
         super();
         this.application = application;
         this.parent = parent;
-//        parentDataSource = false;
-//        if (parent != null)
-//            this.parentDataSource = parent.containsBean(DATA_SOURCE_BEAN);
-//        try {
-//            this.pluginManager = PluginManagerHolder.getPluginManager();
-//            if (this.pluginManager == null) {
-//                this.pluginManager = new DefaultGrailsPluginManager("**/plugins/*/**GrailsPlugin.groovy", application);
-//                PluginManagerHolder.setPluginManager(this.pluginManager);
-//            } else {
-//                LOG.debug("Retrieved thread-bound PluginManager instance");
-//                this.pluginManager.setApplication(application);
-//            }
-//
-//
-//        } catch (IOException e) {
-//            throw new GrailsConfigurationException("I/O error loading plugin manager!:" + e.getMessage(), e);
-//        }
     }
 
     /**
@@ -134,21 +100,8 @@ public class GriffonRuntimeConfigurator implements ApplicationContextAware {
         Assert.notNull(application);
 
         springConfig = springConfig != null ? springConfig : new DefaultRuntimeSpringConfiguration(parent, application.getClass().getClassLoader());
-//        if (!this.pluginManager.isInitialised()) {
-//            this.pluginManager.loadPlugins();
-//        }
-
-//        if (!application.isInitialised()) {
-//            pluginManager.doArtefactConfiguration();
-//            application.initialise();
-//        }
-
-//        this.pluginManager.registerProvidedArtefacts(application);
-
         registerParentBeanFactoryPostProcessors(springConfig);
         
-//        this.pluginManager.doRuntimeConfiguration(springConfig);
-
         LOG.debug("[RuntimeConfiguration] Processing additional external configurations");
 
         if (loadExternalBeans) {
@@ -159,17 +112,6 @@ public class GriffonRuntimeConfigurator implements ApplicationContextAware {
 
         // TODO GRAILS-720 this causes plugin beans to be re-created - should get getApplicationContext always call refresh?
         ApplicationContext ctx = (ApplicationContext) springConfig.getApplicationContext();
-
-//        this.application.setMainContext(ctx);
-//        this.pluginManager.setApplicationContext(ctx);
-//        this.pluginManager.doDynamicMethods();
-
-//        ctx.publishEvent(new GrailsContextEvent(ctx, GrailsContextEvent.DYNAMIC_METHODS_REGISTERED));
-
-
-        performPostProcessing(ctx);
-
-//        application.refreshConstraints();
 
         return ctx;
     }
@@ -188,10 +130,6 @@ public class GriffonRuntimeConfigurator implements ApplicationContextAware {
 
     public void reconfigure(GriffonApplicationContext current, boolean loadExternalBeans) {
         RuntimeSpringConfiguration springConfig = parent != null ? new DefaultRuntimeSpringConfiguration(parent) : new DefaultRuntimeSpringConfiguration();
-//        if (!this.pluginManager.isInitialised())
-//            throw new IllegalStateException("Cannot re-configure Grails application when it hasn't even been configured yet!");
-
-//        this.pluginManager.doRuntimeConfiguration(springConfig);
 
         List beanNames = springConfig.getBeanNames();
         for (Object beanName : beanNames) {
@@ -203,9 +141,6 @@ public class GriffonRuntimeConfigurator implements ApplicationContextAware {
             // force initialisation
             current.getBean(name);
         }
-//        this.pluginManager.doDynamicMethods();
-
-//        this.pluginManager.doPostProcessing(current);
 
         if (loadExternalBeans)
             doPostResourceConfiguration(application, springConfig);
@@ -213,38 +148,21 @@ public class GriffonRuntimeConfigurator implements ApplicationContextAware {
         reset();
     }
 
-    private void performPostProcessing(ApplicationContext ctx) {
-//        this.pluginManager.doPostProcessing(ctx);
-    }
-
     public ApplicationContext configureDomainOnly() {
         DefaultRuntimeSpringConfiguration springConfig = new DefaultRuntimeSpringConfiguration(parent, application.getClass().getClassLoader());
 
-//        if (!this.pluginManager.isInitialised())
-//            this.pluginManager.loadPlugins();
-
-//        if (pluginManager.hasGrailsPlugin("hibernate"))
-//            pluginManager.doRuntimeConfiguration("hibernate", springConfig);
 
         ApplicationContext ctx = (ApplicationContext) springConfig.getApplicationContext();
-
-        performPostProcessing(ctx);
-//        application.refreshConstraints();
 
         return ctx;
     }
 
-    private void doPostResourceConfiguration(IGriffonApplication application, RuntimeSpringConfiguration springConfig) {
+    private void doPostResourceConfiguration(GriffonApplication application, RuntimeSpringConfiguration springConfig) {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         try {
             Resource springResources;
-//            if(application.isWarDeployed()) {
-//                springResources = parent.getResource(GriffonRuntimeConfigurator.SPRING_RESOURCES_XML);
-//            }
-//            else {
-                ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
-                springResources = patternResolver.getResource(SPRING_RESOURCES_XML);
-//            }
+            ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
+            springResources = patternResolver.getResource(SPRING_RESOURCES_XML);
 
             if (springResources != null && springResources.exists()) {
                 LOG.debug("[RuntimeConfiguration] Configuring additional beans from " + springResources.getURL());
@@ -256,18 +174,6 @@ public class GriffonRuntimeConfigurator implements ApplicationContextAware {
                     BeanDefinition bd = xmlBf.getBeanDefinition(beanName);
                     final String beanClassName = bd.getBeanClassName();
                     Class beanClass = beanClassName == null ? null : ClassUtils.forName(beanClassName, classLoader);
-//                    if (SESSION_FACTORY_BEAN.equals(beanName)) {
-//                        Class configurableLocalSessionFactoryBeanClass = ConfigurableLocalSessionFactoryBean.class;
-//                        if (beanClass == null || !configurableLocalSessionFactoryBeanClass.isAssignableFrom(beanClass)) {
-//                            LOG.warn("[RuntimeConfiguration] Found custom Hibernate SessionFactory bean defined in " + springResources.getURL() +
-//                                    ". The bean will not be configured as Grails needs to use its own specialized Hibernate SessionFactoryBean" +
-//                                    " in order to inject dynamic bahavior into domain classes." +
-//                                    " Use specialized Hibernate SessionFactoryBean '" + configurableLocalSessionFactoryBeanClass +
-//                                    "' for custom Hibernate SessionFactory bean defined in '" + springResources.getURL() +
-//                                    "' instead of '" + beanClassName + "' in order to configure custom Hibernate SessionFactory bean.");
-//                            continue;
-//                        }
-//                    }
 
                     springConfig.addBeanDefinition(beanName, bd);
                     String[] aliases = xmlBf.getAliases(beanName);
@@ -363,15 +269,6 @@ public class GriffonRuntimeConfigurator implements ApplicationContextAware {
     public void setLoadExternalPersistenceConfig(boolean b) {
         this.loadExternalPersistenceConfig = b;
     }
-
-//    public void setPluginManager(GrailsPluginManager manager) {
-//        this.pluginManager = manager;
-//    }
-
-//    public GrailsPluginManager getPluginManager() {
-//        return this.pluginManager;
-//    }
-
 
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.parent = applicationContext;
