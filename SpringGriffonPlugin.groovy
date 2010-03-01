@@ -18,14 +18,14 @@
  * @author Andres Almiray
  */
 class SpringGriffonPlugin {
-    def version = "0.1"
-    def canBeGlobal = false
+    def version = 0.2
+    def griffonVersion = "0.3 > *"
     def dependsOn = [:]
 
     def author = "Andres Almiray"
     def authorEmail = "aalmiray@users.sourceforge.net"
     def title = "Spring framework libraries and helpers"
-    def description = '''\\
+    def description = '''
 Brings the Spring framework libraries and some helper classes.
 '''
 
