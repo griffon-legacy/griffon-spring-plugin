@@ -38,7 +38,7 @@ public class ObjectFactoryBean implements FactoryBean {
     }
 
     public Class getObjectType() {
-        return objectClass != null ? objectClass : object.getClass();
+        return objectClass != null ? objectClass : (object != null ? object.getClass() : null);
     }
 
     public boolean isSingleton() {

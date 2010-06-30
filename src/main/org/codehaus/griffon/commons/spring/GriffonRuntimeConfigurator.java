@@ -20,6 +20,8 @@ import grails.spring.BeanBuilder;
 // import griffon.util.GriffonUtil;
 import groovy.lang.Closure;
 import groovy.lang.Script;
+import groovy.lang.GroovyClassLoader;
+import groovy.lang.GroovyCodeSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import griffon.core.GriffonApplication;
@@ -227,34 +229,57 @@ public class GriffonRuntimeConfigurator implements ApplicationContextAware {
      */
     public static void loadExternalSpringConfig(RuntimeSpringConfiguration config, ClassLoader classLoader) {
         if(springGroovyResourcesBeanBuilder == null) {
+            loadPluginGroovyResources(config, classLoader);
             try {
                 Class groovySpringResourcesClass = null;
                 try {
-                    groovySpringResourcesClass = ClassUtils.forName(GriffonRuntimeConfigurator.SPRING_RESOURCES_CLASS,
-                        classLoader);
+                    groovySpringResourcesClass = ClassUtils.forName(SPRING_RESOURCES_CLASS, classLoader);
                 } catch (ClassNotFoundException e) {
                     // ignore
                 }
-                if (groovySpringResourcesClass != null) {
-                    springGroovyResourcesBeanBuilder = new BeanBuilder(null, config,Thread.currentThread().getContextClassLoader());
-                    Script script = (Script) groovySpringResourcesClass.newInstance();
-                    script.run();
-                    Object beans = script.getProperty("beans");
-                    springGroovyResourcesBeanBuilder.beans((Closure) beans);
-                }
+                loadBeansFromScript(config, groovySpringResourcesClass);
             } catch (Exception ex) {
-                // GrailsUtil.deepSanitize(ex);
+                // GriffonUtil.deepSanitize(ex);
                 LOG.error("[RuntimeConfiguration] Unable to load beans from resources.groovy", ex);
             }
-
-        }
-        else {
+        } else {
             if(!springGroovyResourcesBeanBuilder.getSpringConfig().equals(config)) {
                 springGroovyResourcesBeanBuilder.registerBeans(config);
             }
         }
     }
 
+    private static void loadBeansFromScript(RuntimeSpringConfiguration config, Class scriptClass) throws Exception {
+        if(scriptClass == null) return;
+        if(springGroovyResourcesBeanBuilder == null) {
+            springGroovyResourcesBeanBuilder = new BeanBuilder(null, config, Thread.currentThread().getContextClassLoader());
+        }
+
+        Script script = (Script) scriptClass.newInstance();
+        script.run();
+        Object beans = script.getProperty("beans");
+        springGroovyResourcesBeanBuilder.beans((Closure) beans);
+    }
+
+    private static void loadPluginGroovyResources(RuntimeSpringConfiguration config, ClassLoader classLoader) {
+        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(classLoader);
+        GroovyClassLoader gcl = new GroovyClassLoader(classLoader);
+        try {
+            Resource[] resources = resolver.getResources("classpath*:/META-INF/spring/springbeans.groovy");
+            for(Resource resource: resources) {
+                try {
+                    Class scriptClass = gcl.parseClass(new GroovyCodeSource(resource.getURL()));
+                    loadBeansFromScript(config, scriptClass);
+                } catch(Exception ex) {
+                    // GriffonUtil.deepSanitize(ex);
+                    LOG.error("[RuntimeConfiguration] Unable to load beans from "+ resource, ex);
+                }
+            }
+        } catch(IOException ioe) {
+            // GriffonUtil.deepSanitize(ioe);
+            LOG.error("[RuntimeConfiguration] Unable to load beans from plugin resources", ioe);
+        }
+    }
 
     public static void loadSpringGroovyResources(RuntimeSpringConfiguration config, ClassLoader classLoader) {
         loadExternalSpringConfig(config, classLoader);

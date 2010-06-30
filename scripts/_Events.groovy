@@ -18,10 +18,9 @@
  * @author Andres Almiray
  */
 
-includeTargets << griffonScript("Compile")
+includeTargets << griffonScript("_GriffonCompile")
 
-eventCompileEnd = { type ->
-    if(type != "source") return
+eventCompileEnd = {
     def spring = "${basedir}/src/spring"
     def springdir = new File(spring)
     if(!springdir.exists()) return
@@ -31,17 +30,10 @@ eventCompileEnd = { type ->
     if(sourcesUpToDate("${basedir}/src/spring", classesDirPath, ".groovy")) return
 
     ant.echo(message: "Compiling Spring resources to $classesDirPath")
-    try {
-        String classpathId = "griffon.compile.classpath"
-        ant.groovyc(destdir: classesDirPath,
-                    classpathref: classpathId) {
-            src(path: spring)
-            javac(classpathref: classpathId)
-        }
-    }
-    catch (Exception e) {
-        event("StatusFinal", ["Compilation error: ${e.message}"])
-        ant.fail(message: "Could not compile Spring resources: " + e.class.simpleName + ": " + e.message)
+    String classpathId = "griffon.compile.classpath"
+    compileSources(classesDirPath, classpathId) {
+        src(path: spring)
+        javac(classpathref: classpathId)
     }
 }
 
