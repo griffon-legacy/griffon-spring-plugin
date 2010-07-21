@@ -1,7 +1,12 @@
-<plugin name='spring' version='0.2' griffonVersion='0.3 &gt; *' jdk='1.5'>
+<plugin name='spring' version='0.3' griffonVersion='0.9 &gt; *' jdk='1.5'>
   <author>Andres Almiray</author>
   <authorEmail>aalmiray@users.sourceforge.net</authorEmail>
   <title>Spring framework libraries and helpers</title>
+  <description>Brings the Spring framework libraries and some helper classes.</description>
   <documentation>http://griffon.codehaus.org/Spring+Plugin</documentation>
+  <license>Apache Software License 2.0</license>
+  <resources>
+    <resource>BuildConfig</resource>
+  </resources>
   <dependencies />
 </plugin>

@@ -17,8 +17,10 @@
 import grails.spring.BeanBuilder
 
 import griffon.core.GriffonApplication
+import griffon.core.ArtifactManager
 import griffon.spring.artifact.SpringServiceArtifactHandler
 import griffon.spring.factory.support.GriffonApplicationFactoryBean
+import griffon.spring.factory.support.ObjectFactoryBean
 import org.codehaus.griffon.commons.spring.GriffonApplicationContext
 import org.codehaus.griffon.commons.spring.GriffonRuntimeConfigurator
 import org.codehaus.griffon.commons.spring.DefaultRuntimeSpringConfiguration
@@ -32,16 +34,22 @@ class SpringGriffonAddon {
 
     def addonInit(appInstance) {
         app = appInstance
-        
-        def rootAppCtx = registerBeans {
+
+        GriffonApplicationContext rootAppCtx = new GriffonApplicationContext()        
+        rootAppCtx.refresh()
+        def configurator = new GriffonRuntimeConfigurator(app, rootAppCtx)
+        def springConfig = new DefaultRuntimeSpringConfiguration(rootAppCtx, app.class.classLoader)
+        def bb = new BeanBuilder(rootAppCtx, app.class.classLoader)
+        bb.beans {
             'app'(GriffonApplicationFactoryBean) {
                 application = appInstance
             }
+            'artifactManager'(ObjectFactoryBean) {
+                object = ArtifactManager.instance
+            }
         }
-
-        def configurator = new GriffonRuntimeConfigurator(app, rootAppCtx)
-        def springConfig = new DefaultRuntimeSpringConfiguration(rootAppCtx, app.class.classLoader)
-        GriffonRuntimeConfigurator.loadExternalSpringConfig(springConfig, app.class.classLoader)
+        bb.registerBeans(springConfig)
+        GriffonRuntimeConfigurator.loadSpringGroovyResourcesIntoContext(springConfig, app.class.classLoader, rootAppCtx)
         def applicationContext = configurator.configure(springConfig)
         app.metaClass.applicationContext = applicationContext
 
