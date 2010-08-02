@@ -16,14 +16,16 @@
 
 import grails.spring.BeanBuilder
 
+import griffon.core.GriffonClass
 import griffon.core.GriffonApplication
 import griffon.core.ArtifactManager
-import griffon.spring.artifact.SpringServiceArtifactHandler
+import griffon.util.UIThreadHelper
 import griffon.spring.factory.support.GriffonApplicationFactoryBean
 import griffon.spring.factory.support.ObjectFactoryBean
-import org.codehaus.griffon.commons.spring.GriffonApplicationContext
-import org.codehaus.griffon.commons.spring.GriffonRuntimeConfigurator
-import org.codehaus.griffon.commons.spring.DefaultRuntimeSpringConfiguration
+import org.codehaus.griffon.runtime.spring.GriffonApplicationContext
+import org.codehaus.griffon.runtime.spring.GriffonRuntimeConfigurator
+import org.codehaus.griffon.runtime.spring.DefaultRuntimeSpringConfiguration
+import org.codehaus.griffon.runtime.core.SpringServiceArtifactHandler
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 
 /**
@@ -44,16 +46,34 @@ class SpringGriffonAddon {
             'app'(GriffonApplicationFactoryBean) {
                 application = appInstance
             }
+            'appConfig'(ObjectFactoryBean) {
+                object = appInstance.config
+                objectClass = ConfigObject
+            }
             'artifactManager'(ObjectFactoryBean) {
                 object = ArtifactManager.instance
             }
+            'uiThreadHelper'(ObjectFactoryBean) {
+                object = UIThreadHelper.instance
+            }
+
+            def registerClass = { GriffonClass griffonClass ->
+                "${griffonClass.propertyName}Class"(ObjectFactoryBean) { bean ->
+                    bean.scope = 'singleton'
+                    bean.autowire = 'byName'
+                    object = griffonClass
+                }
+            }
+            ArtifactManager.instance.modelClasses.each(registerClass)
+            ArtifactManager.instance.controllerClasses.each(registerClass)
+            ArtifactManager.instance.viewClasses.each(registerClass)
         }
         bb.registerBeans(springConfig)
         GriffonRuntimeConfigurator.loadSpringGroovyResourcesIntoContext(springConfig, app.class.classLoader, rootAppCtx)
         def applicationContext = configurator.configure(springConfig)
         app.metaClass.applicationContext = applicationContext
 
-        app.artifactManager.registerArtifactHandler(new SpringServiceArtifactHandler())
+        app.artifactManager.registerArtifactHandler(new SpringServiceArtifactHandler(app))
     }
 
     // ================== EVENTS =================

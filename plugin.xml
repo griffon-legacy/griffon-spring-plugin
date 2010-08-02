@@ -1,4 +1,4 @@
-<plugin name='spring' version='0.3' griffonVersion='0.9 &gt; *' jdk='1.5'>
+<plugin name='spring' version='0.4' griffonVersion='0.9.1 &gt; *' jdk='1.5'>
   <author>Andres Almiray</author>
   <authorEmail>aalmiray@users.sourceforge.net</authorEmail>
   <title>Spring framework libraries and helpers</title>

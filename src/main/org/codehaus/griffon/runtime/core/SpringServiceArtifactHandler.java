@@ -14,13 +14,21 @@
 * limitations under the License.
 */
 
-package griffon.spring.artifact
+package org.codehaus.griffon.runtime.core;
+
+import griffon.core.GriffonApplication;
+import griffon.core.GriffonClass;
+import griffon.core.GriffonServiceClass;
 
 /**
  * @author Andres Almiray
  */
 class SpringServiceArtifactHandler extends SpringArtifactHandlerAdapter {
-    SpringServiceArtifactHandler() {
-        super("service")
+    SpringServiceArtifactHandler(GriffonApplication app) {
+        super(app, GriffonServiceClass.TYPE, GriffonServiceClass.TRAILING);
+    }
+
+    protected GriffonClass newGriffonClassInstance(Class clazz) {
+        return new DefaultGriffonServiceClass(getApp(), clazz);
     }
 }

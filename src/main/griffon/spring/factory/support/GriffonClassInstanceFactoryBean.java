@@ -16,33 +16,33 @@
 
 package griffon.spring.factory.support;
 
-import griffon.core.ArtifactInfo;
+import griffon.core.GriffonClass;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
  * @author Andres Almiray
  */
-public class ArtifactFactoryBean implements FactoryBean {
-    private ArtifactInfo artifact;
+public class GriffonClassInstanceFactoryBean implements FactoryBean {
+    private GriffonClass griffonClass;
     private boolean singleton = true;
 
-    public void setArtifact(ArtifactInfo artifact) {
-        this.artifact = artifact;
-    }
-
-    public void setSingleton(boolean singleton) {
-        this.singleton = singleton;
+    public void setGriffonClass(GriffonClass griffonClass) {
+        this.griffonClass = griffonClass;
     }
 
     public Object getObject() throws Exception {
-        return artifact.newInstance();
+        return griffonClass.newInstance();
     }
 
     public Class getObjectType() {
-        return artifact.getKlass();
+        return griffonClass.getClazz();
     }
 
     public boolean isSingleton() {
         return singleton;
+    }
+
+    public void setSingleton(boolean singleton) {
+        this.singleton = singleton;
     }
 }

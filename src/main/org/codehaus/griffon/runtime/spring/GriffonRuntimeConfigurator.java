@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-package org.codehaus.griffon.commons.spring;
+package org.codehaus.griffon.runtime.spring;
 
 import grails.spring.BeanBuilder;
 // import griffon.util.GriffonUtil;
@@ -216,10 +216,9 @@ public class GriffonRuntimeConfigurator implements ApplicationContextAware {
                                                     GenericApplicationContext context) {
 
         loadExternalSpringConfig(config, classLoader);
-        if (context != null) {
+        if (springGroovyResourcesBeanBuilder != null && context != null) {
             springGroovyResourcesBeanBuilder.registerBeans(context);
         }
-
     }
 
     /**

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.codehaus.griffon.commons.spring;
+package org.codehaus.griffon.runtime.spring;
 
 import groovy.lang.GroovySystem;
 import groovy.lang.MetaClass;
