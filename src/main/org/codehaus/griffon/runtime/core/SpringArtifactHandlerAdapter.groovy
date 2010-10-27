@@ -27,12 +27,12 @@ import griffon.spring.factory.support.GriffonClassInstanceFactoryBean
  * @author Andres Almiray
  */
 abstract class SpringArtifactHandlerAdapter extends ArtifactHandlerAdapter {
-	private final boolean autoRegisterArtifacts
+    private final boolean autoRegisterArtifacts
 
     SpringArtifactHandlerAdapter(GriffonApplication app, String type, String trailing) {
         this(app, type, trailing, true)
     }
-	
+    
     SpringArtifactHandlerAdapter(GriffonApplication app, String type, String trailing, boolean autoRegisterArtifacts) {
         super(app, type, trailing)
         this.autoRegisterArtifacts = autoRegisterArtifacts
@@ -45,11 +45,11 @@ abstract class SpringArtifactHandlerAdapter extends ArtifactHandlerAdapter {
     }
 
     void registerArtifacts() {
-	    registerGriffonClasses()
-	    registerInstances()
-	}
-	
-	protected void registerGriffonClasses() {
+        registerGriffonClasses()
+        registerInstances()
+    }
+    
+    protected void registerGriffonClasses() {
         doWithBeanBuilder(app) { 
             classes.each { GriffonClass targetGriffonClass ->
                 "${targetGriffonClass.propertyName}Class"(ObjectFactoryBean) { bean ->
@@ -62,7 +62,7 @@ abstract class SpringArtifactHandlerAdapter extends ArtifactHandlerAdapter {
     }
 
     protected void registerInstances() {
-	    doWithBeanBuilder(app) { 
+        doWithBeanBuilder(app) { 
             classes.each { GriffonClass targetGriffonClass ->
                 "${targetGriffonClass.propertyName}"(GriffonClassInstanceFactoryBean) { bean ->
                     bean.scope = 'singleton'
