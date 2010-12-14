@@ -1,26 +1,27 @@
 griffon.project.dependency.resolution = {
-    // inherit Griffon' default dependencies
-    inherits("global") {
-    }
-    log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
+    inherits("global")
+    log "warn"
     repositories {
         griffonPlugins()
         griffonHome()
         griffonCentral()
 
-        // uncomment the below to enable remote dependency resolution
-        // from public Maven repositories
-        //mavenLocal()
-        //mavenCentral()
-        //mavenRepo "http://snapshots.repository.codehaus.org"
-        //mavenRepo "http://repository.codehaus.org"
-        //mavenRepo "http://download.java.net/maven/2/"
-        //mavenRepo "http://repository.jboss.com/maven2/"
+        mavenCentral()
+        mavenRepo 'http://repository.springsource.com/maven/bundles/release'
+        flatDir name: 'springPluginLib', dirs: 'lib'
     }
     dependencies {
-        // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-
-        // runtime 'mysql:mysql-connector-java:5.1.5'
+        def springVersion = '3.0.3.RELEASE'
+        compile("org.springframework:org.springframework.aop:$springVersion") { transitive = false }
+        compile("org.springframework:org.springframework.asm:$springVersion") { transitive = false }
+        compile("org.springframework:org.springframework.aspects:$springVersion") { transitive = false }
+        compile("org.springframework:org.springframework.core:$springVersion") { transitive = false }
+        compile("org.springframework:org.springframework.beans:$springVersion") { transitive = false }
+        compile("org.springframework:org.springframework.context:$springVersion") { transitive = false }
+        compile("org.springframework:org.springframework.context.support:$springVersion") { transitive = false }
+        compile("org.springframework:org.springframework.expression:$springVersion") { transitive = false }
+        compile("org.springframework:org.springframework.transaction:$springVersion") { transitive = false }
+        compile("org.grails:grails-spring:1.3.5") { transitive = false }
     }
 }
 
