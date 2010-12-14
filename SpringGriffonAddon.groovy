@@ -18,7 +18,6 @@ import grails.spring.BeanBuilder
 
 import griffon.core.GriffonClass
 import griffon.core.GriffonApplication
-import griffon.core.ArtifactManager
 import griffon.util.UIThreadHelper
 import griffon.spring.factory.support.GriffonApplicationFactoryBean
 import griffon.spring.factory.support.ObjectFactoryBean
@@ -51,7 +50,7 @@ class SpringGriffonAddon {
                 objectClass = ConfigObject
             }
             'artifactManager'(ObjectFactoryBean) {
-                object = ArtifactManager.instance
+                object = app.artifactManager
             }
             'uiThreadHelper'(ObjectFactoryBean) {
                 object = UIThreadHelper.instance
@@ -64,9 +63,9 @@ class SpringGriffonAddon {
                     object = griffonClass
                 }
             }
-            ArtifactManager.instance.modelClasses.each(registerClass)
-            ArtifactManager.instance.controllerClasses.each(registerClass)
-            ArtifactManager.instance.viewClasses.each(registerClass)
+            app.artifactManager.modelClasses.each(registerClass)
+            app.artifactManager.controllerClasses.each(registerClass)
+            app.artifactManager.viewClasses.each(registerClass)
         }
         bb.registerBeans(springConfig)
         GriffonRuntimeConfigurator.loadSpringGroovyResourcesIntoContext(springConfig, app.class.classLoader, rootAppCtx)
