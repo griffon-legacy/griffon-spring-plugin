@@ -23,10 +23,14 @@ import grails.spring.BeanBuilder
 import griffon.spring.factory.support.ObjectFactoryBean
 import griffon.spring.factory.support.GriffonClassInstanceFactoryBean
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 /**
  * @author Andres Almiray
  */
 abstract class SpringArtifactHandlerAdapter extends ArtifactHandlerAdapter {
+    private static final Logger LOG = LoggerFactory.getLogger(SpringArtifactHandlerAdapter)
     private final boolean autoRegisterArtifacts
 
     SpringArtifactHandlerAdapter(GriffonApplication app, String type, String trailing) {
@@ -50,8 +54,10 @@ abstract class SpringArtifactHandlerAdapter extends ArtifactHandlerAdapter {
     }
     
     protected void registerGriffonClasses() {
+        LOG.trace("Registering beans of type GriffonClass for ${this.class.name}")
         doWithBeanBuilder(app) { 
             classes.each { GriffonClass targetGriffonClass ->
+                SpringArtifactHandlerAdapter.LOG.trace("Registering ${targetGriffonClass.class.name} as ${targetGriffonClass.propertyName}Class")
                 "${targetGriffonClass.propertyName}Class"(ObjectFactoryBean) { bean ->
                     bean.scope = 'singleton'
                     bean.autowire = 'byName'
@@ -62,8 +68,10 @@ abstract class SpringArtifactHandlerAdapter extends ArtifactHandlerAdapter {
     }
 
     protected void registerInstances() {
+        LOG.trace("Registering bean instances of type GriffonClass for ${this.class.name}")
         doWithBeanBuilder(app) { 
             classes.each { GriffonClass targetGriffonClass ->
+                SpringArtifactHandlerAdapter.LOG.trace("Registering bean of ${targetGriffonClass.class.name} as ${targetGriffonClass.propertyName}")
                 "${targetGriffonClass.propertyName}"(GriffonClassInstanceFactoryBean) { bean ->
                     bean.scope = 'singleton'
                     bean.autowire = 'byName'
