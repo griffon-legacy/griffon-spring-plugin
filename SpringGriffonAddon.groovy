@@ -19,6 +19,7 @@ import grails.spring.BeanBuilder
 import griffon.core.GriffonClass
 import griffon.core.GriffonApplication
 import griffon.util.UIThreadHelper
+import griffon.spring.ApplicationContextHolder
 import griffon.spring.factory.support.GriffonApplicationFactoryBean
 import griffon.spring.factory.support.ObjectFactoryBean
 import org.codehaus.griffon.runtime.spring.GriffonApplicationContext
@@ -70,6 +71,7 @@ class SpringGriffonAddon {
         bb.registerBeans(springConfig)
         GriffonRuntimeConfigurator.loadSpringGroovyResourcesIntoContext(springConfig, app.class.classLoader, rootAppCtx)
         def applicationContext = configurator.configure(springConfig)
+        ApplicationContextHolder.applicationContext = applicationContext
         app.metaClass.applicationContext = applicationContext
 
         app.artifactManager.registerArtifactHandler(new SpringServiceArtifactHandler(app))
