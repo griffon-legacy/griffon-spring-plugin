@@ -85,8 +85,12 @@ class SpringGriffonAddon {
                 .autowireBeanProperties(instance, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false)
         },
         LoadAddonsEnd: { app, addons ->
+            app.event('WithSpringStart', [app, app.applicationContext])
             addons.each { withSpring(it.value) }
+            app.event('WithSpringEnd', [app, app.applicationContext])
+            app.event('WhenSpringReadyStart', [app, app.applicationContext])
             addons.each { springReady(it.value) }
+            app.event('WhenSpringReadyEnd', [app, app.applicationContext])
         }
     ]
 
