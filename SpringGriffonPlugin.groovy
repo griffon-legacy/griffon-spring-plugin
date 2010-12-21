@@ -18,9 +18,9 @@
  * @author Andres Almiray
  */
 class SpringGriffonPlugin {
-    def version = 0.4
+    def version = 0.5
     def dependsOn = [:]
-    def griffonVersion = '0.9.1 > *'
+    def griffonVersion = '0.9.2 > *'
     def license = 'Apache Software License 2.0'
 
     def author = 'Andres Almiray'

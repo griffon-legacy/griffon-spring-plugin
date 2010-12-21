@@ -56,15 +56,15 @@ sourcesUpToDate = { src, dest, srcsfx = ".java", destsfx = ".class" ->
     return true
 }
 
-def eventClosure1 = binding.variables.containsKey('eventCopyLibsEnd') ? eventCopyLibsEnd : {jardir->}
-eventCopyLibsEnd = { jardir ->
-    eventClosure1(jardir)
-    if (!isPluginProject) {
-        def pluginDir = getPluginDirForName('spring')
-        if(pluginDir?.file?.exists()) {
-            ant.fileset(dir: "${pluginDir.file}/lib/", includes: '*.jar').each {
-                griffonCopyDist(it.toString(), jardir)
-            }
-        }
-    }
+def eventClosure1 = binding.variables.containsKey('eventSetClasspath') ? eventSetClasspath : {cl->}
+eventSetClasspath = { cl ->
+    eventClosure1(cl)
+    if(compilingPlugin('spring')) return
+    griffonSettings.dependencyManager.flatDirResolver name: 'griffon-spring-plugin', dirs: "${springPluginDir}/addon"
+    griffonSettings.dependencyManager.addPluginDependency('spring', [
+        conf: 'compile',
+        name: 'griffon-spring-addon',
+        group: 'org.codehaus.griffon.plugins',
+        version: springPluginVersion
+    ])
 }

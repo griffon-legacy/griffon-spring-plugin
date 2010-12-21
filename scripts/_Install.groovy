@@ -35,7 +35,7 @@ root.'SpringGriffonAddon'.addon=true
 
 ant.mkdir(dir: "${basedir}/src/spring")
 
-if(!(config.text =~ /(?m)^griffon.basic_injection.disable.*/ )) {
+if(config.griffon.basic_injection.disable instanceof ConfigObject) {
    configFile.append('''
 griffon.basic_injection.disable = true
 ''')
