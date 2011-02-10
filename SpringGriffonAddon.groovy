@@ -17,6 +17,8 @@
 import grails.spring.BeanBuilder
 
 import griffon.core.GriffonClass
+import griffon.core.GriffonAddon
+import griffon.core.GriffonService
 import griffon.core.GriffonApplication
 import griffon.util.UIThreadHelper
 import griffon.spring.ApplicationContextHolder
@@ -75,6 +77,10 @@ class SpringGriffonAddon {
         app.metaClass.applicationContext = applicationContext
 
         app.artifactManager.registerArtifactHandler(new SpringServiceArtifactHandler(app))
+        
+        app.metaClass.getServices = {->
+            Collections.unmodifiableMap(applicationContext.getBeansOfType(GriffonService))   
+        }
     }
 
     // ================== EVENTS =================
@@ -83,6 +89,7 @@ class SpringGriffonAddon {
         NewInstance: { klass, type, instance ->
             app.applicationContext.getAutowireCapableBeanFactory()
                 .autowireBeanProperties(instance, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false)
+            if(type == 'service') app.addApplicationEventListener(instance)
         },
         LoadAddonsEnd: { app, addons ->
             app.event('WithSpringStart', [app, app.applicationContext])
@@ -97,10 +104,10 @@ class SpringGriffonAddon {
     // =================== IMPL ==================
 
     private void withSpring(addon) {
-        def addonMetaClass = addon.metaClass
+        def addonMetaClass = addon.addonDelegate.metaClass
         def doWithSpring = addonMetaClass.getMetaProperty('doWithSpring')
         if(doWithSpring) {
-            def beans = addon.getProperty('doWithSpring')
+            def beans = addon.addonDelegate.getProperty('doWithSpring')
             if(beans instanceof Closure) {
                 registerBeans(app.applicationContext, beans)
             }
@@ -122,7 +129,7 @@ class SpringGriffonAddon {
 
     private void springReady(addon) {
         try {
-            addon.whenSpringReady(app)
+            addon.addonDelegate.whenSpringReady(app)
         } catch(MissingMethodException mme) {
             if(mme.method != 'whenSpringReady') throw mme
         }
