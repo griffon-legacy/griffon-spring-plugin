@@ -31,11 +31,11 @@ public class GriffonClassInstanceFactoryBean implements FactoryBean {
     }
 
     public Object getObject() throws Exception {
-        return griffonClass.newInstance();
+        return griffonClass != null ? griffonClass.newInstance() : null;
     }
 
     public Class getObjectType() {
-        return griffonClass.getClazz();
+        return griffonClass != null ? griffonClass.getClazz() : null;
     }
 
     public boolean isSingleton() {
