@@ -54,7 +54,7 @@ abstract class SpringArtifactHandlerAdapter extends ArtifactHandlerAdapter {
     }
     
     protected void registerGriffonClasses() {
-        LOG.trace("Registering beans of type GriffonClass for ${this.class.name}")
+        LOG.trace("Registering beans of type griffon.core.GriffonClass for ${this.class.name}")
         doWithBeanBuilder(app) { 
             classes.each { GriffonClass targetGriffonClass ->
                 SpringArtifactHandlerAdapter.LOG.trace("Registering ${targetGriffonClass.class.name} as ${targetGriffonClass.propertyName}Class")
@@ -68,10 +68,10 @@ abstract class SpringArtifactHandlerAdapter extends ArtifactHandlerAdapter {
     }
 
     protected void registerInstances() {
-        LOG.trace("Registering bean instances of type GriffonClass for ${this.class.name}")
+        LOG.trace("Registering bean instances for ${this.class.name}")
         doWithBeanBuilder(app) { 
             classes.each { GriffonClass targetGriffonClass ->
-                SpringArtifactHandlerAdapter.LOG.trace("Registering bean of ${targetGriffonClass.class.name} as ${targetGriffonClass.propertyName}")
+                SpringArtifactHandlerAdapter.LOG.trace("Registering bean ${targetGriffonClass.clazz.name} as ${targetGriffonClass.propertyName}")
                 "${targetGriffonClass.propertyName}"(GriffonClassInstanceFactoryBean) { bean ->
                     bean.scope = 'singleton'
                     bean.autowire = 'byName'

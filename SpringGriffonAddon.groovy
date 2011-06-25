@@ -20,7 +20,7 @@ import griffon.core.GriffonClass
 import griffon.core.GriffonAddon
 import griffon.core.GriffonService
 import griffon.core.GriffonApplication
-import griffon.util.UIThreadHelper
+import griffon.core.UIThreadManager
 import griffon.spring.ApplicationContextHolder
 import griffon.spring.factory.support.GriffonApplicationFactoryBean
 import griffon.spring.factory.support.ObjectFactoryBean
@@ -55,8 +55,11 @@ class SpringGriffonAddon {
             'artifactManager'(ObjectFactoryBean) {
                 object = app.artifactManager
             }
-            'uiThreadHelper'(ObjectFactoryBean) {
-                object = UIThreadHelper.instance
+            'addonManager'(ObjectFactoryBean) {
+                object = app.addonManager
+            }
+            'uiThreadManager'(ObjectFactoryBean) {
+                object = UIThreadManager.instance
             }
 
             def registerClass = { GriffonClass griffonClass ->
