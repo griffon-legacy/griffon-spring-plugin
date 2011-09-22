@@ -34,30 +34,35 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory
  * @author Andres Almiray
  */
 class SpringGriffonAddon {
-    GriffonApplication app
-
-    def addonInit(appInstance) {
-        app = appInstance
-
+    void addonInit(GriffonApplication app) {
         GriffonApplicationContext rootAppCtx = new GriffonApplicationContext()        
         rootAppCtx.refresh()
         def configurator = new GriffonRuntimeConfigurator(app, rootAppCtx)
         def springConfig = new DefaultRuntimeSpringConfiguration(rootAppCtx, app.class.classLoader)
         def bb = new BeanBuilder(rootAppCtx, app.class.classLoader)
         bb.beans {
-            'app'(GriffonApplicationFactoryBean) {
-                application = appInstance
+            'application'(ObjectFactoryBean) {
+                object = app
+                objectClass = GriffonApplication
             }
             'appConfig'(ObjectFactoryBean) {
-                object = appInstance.config
+                object = app.config
                 objectClass = ConfigObject
             }
             'artifactManager'(ObjectFactoryBean) {
                 object = app.artifactManager
+                objectClass = griffon.core.ArtifactManager
             }
             'addonManager'(ObjectFactoryBean) {
                 object = app.addonManager
+                objectClass = griffon.core.AddonManager
             }
+            /*
+            'mvcGroupManager'(ObjectFactoryBean) {
+                object = app.mvcGroupManager
+                objectClass = griffon.core.MCVGroupManager
+            }
+            */
             'uiThreadManager'(ObjectFactoryBean) {
                 object = UIThreadManager.instance
             }
@@ -107,10 +112,11 @@ class SpringGriffonAddon {
     // =================== IMPL ==================
 
     private void withSpring(addon) {
-        def addonMetaClass = addon.addonDelegate.metaClass
+        def target = addon instanceof GriffonAddon ? addon : addon.addonDelegate
+        def addonMetaClass = target.metaClass
         def doWithSpring = addonMetaClass.getMetaProperty('doWithSpring')
         if(doWithSpring) {
-            def beans = addon.addonDelegate.getProperty('doWithSpring')
+            def beans = target.getProperty('doWithSpring')
             if(beans instanceof Closure) {
                 registerBeans(app.applicationContext, beans)
             }
@@ -132,7 +138,8 @@ class SpringGriffonAddon {
 
     private void springReady(addon) {
         try {
-            addon.addonDelegate.whenSpringReady(app)
+            def target = addon instanceof GriffonAddon ? addon : addon.addonDelegate
+            target.whenSpringReady(app)
         } catch(MissingMethodException mme) {
             if(mme.method != 'whenSpringReady') throw mme
         }
