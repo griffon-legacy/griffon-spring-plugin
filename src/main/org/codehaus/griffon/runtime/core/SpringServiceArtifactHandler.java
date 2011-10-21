@@ -16,16 +16,43 @@
 
 package org.codehaus.griffon.runtime.core;
 
-import griffon.core.GriffonApplication;
-import griffon.core.GriffonClass;
-import griffon.core.GriffonServiceClass;
+import griffon.core.*;
+import java.util.Map;
+import java.util.Collections;
+import griffon.spring.ApplicationContextHolder;
+import org.codehaus.groovy.runtime.InvokerHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Andres Almiray
  */
 class SpringServiceArtifactHandler extends SpringArtifactHandlerAdapter {
+    private static final Logger LOG = LoggerFactory.getLogger(SpringServiceArtifactHandler.class);
+    private final ServiceManager serviceManager;
+
+    private class SpringServiceManager extends AbstractServiceManager {
+        public SpringServiceManager(GriffonApplication app) {
+            super(app);
+        }
+
+        public Map<String, GriffonService> getServices() {
+            return Collections.unmodifiableMap(ApplicationContextHolder.getApplicationContext().getBeansOfType(GriffonService.class));
+        }
+
+        public GriffonService findService(String name) {
+            if(!name.endsWith(GriffonServiceClass.TRAILING)) name += GriffonServiceClass.TRAILING;
+            return (GriffonService) ApplicationContextHolder.getApplicationContext().getBean(name);
+        }
+    }
+    
     SpringServiceArtifactHandler(GriffonApplication app) {
         super(app, GriffonServiceClass.TYPE, GriffonServiceClass.TRAILING);
+        serviceManager = new SpringServiceManager(app);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Registering " + serviceManager + " as ServiceManager.");
+        }
+        InvokerHelper.setProperty(app, "serviceManager", serviceManager);
     }
 
     protected GriffonClass newGriffonClassInstance(Class clazz) {

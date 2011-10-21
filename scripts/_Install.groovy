@@ -19,24 +19,18 @@
  */
 
 // check to see if we already have a SpringGriffonAddon
-boolean addonIsSet1
-builderConfig.each() { prefix, v ->
-    v.each { builder, views ->
-        addonIsSet1 = addonIsSet1 || 'SpringGriffonAddon' == builder
-    }
-}
-
-if (!addonIsSet1) {
+configText = '''root.'SpringGriffonAddon'.addon=true'''
+if(!(builderConfigFile.text.contains(configText))) {
     println 'Adding SpringGriffonAddon to Builder.groovy'
-    builderConfigFile.append('''
-root.'SpringGriffonAddon'.addon=true
-''')
+    builderConfigFile.text += '\n' + configText + '\n'
 }
 
 ant.mkdir(dir: "${basedir}/src/spring")
 
+/*
 if(config.griffon.basic_injection.disable instanceof ConfigObject) {
    configFile.append('''
 griffon.basic_injection.disable = true
 ''')
 }
+*/

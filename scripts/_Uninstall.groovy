@@ -19,13 +19,8 @@
  */
 
 // check to see if we already have a SpringGriffonAddon
-boolean addonIsSet1
-builderConfig.each() { prefix, v ->
-    v.each { builder, views ->
-        addonIsSet1 = addonIsSet1 || 'SpringGriffonAddon' == builder
-    }
-}
-
-if(addonIsSet1) {
-    builderConfigFile.text = builderConfigFile.text - "root.'SpringGriffonAddon'.addon=true\n"
+configText = '''root.'SpringGriffonAddon'.addon=true'''
+if(builderConfigFile.text.contains(configText)) {
+    println 'Removing SpringGriffonAddon from Builder.groovy'
+    builderConfigFile.text -= configText
 }
