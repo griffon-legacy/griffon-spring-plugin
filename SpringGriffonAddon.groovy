@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010 the original author or authors.
+ * Copyright 2009-2011 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,12 +57,10 @@ class SpringGriffonAddon {
                 object = app.addonManager
                 objectClass = griffon.core.AddonManager
             }
-            /*
             'mvcGroupManager'(ObjectFactoryBean) {
                 object = app.mvcGroupManager
-                objectClass = griffon.core.MCVGroupManager
+                objectClass = griffon.core.MVCGroupManager
             }
-            */
             'uiThreadManager'(ObjectFactoryBean) {
                 object = UIThreadManager.instance
             }
@@ -85,10 +83,6 @@ class SpringGriffonAddon {
         app.metaClass.applicationContext = applicationContext
 
         app.artifactManager.registerArtifactHandler(new SpringServiceArtifactHandler(app))
-        
-        app.metaClass.getServices = {->
-            Collections.unmodifiableMap(applicationContext.getBeansOfType(GriffonService))   
-        }
     }
 
     // ================== EVENTS =================
