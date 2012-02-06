@@ -38,7 +38,7 @@ class SpringGriffonPlugin {
     // URL where documentation can be found
     String documentation = ''
     // URL where source can be found
-    String source = ''
+    String source = 'https://github.com/aalmiray/griffon-spring-plugin'
 
     List authors = [
         [
@@ -102,14 +102,14 @@ contributions that require spring classes which are not available in the plugin'
 
 The following beans are automatically configured in the ApplicationContext
 
-| Name            | Type                            | Notes                           |
+| Name            | Type                            | Notes                           |
 | ----------------| ------------------------------- | ------------------------------- |
 | application     | griffon.core.GriffonApplication | current application instance    |
-| appConfig       | groovy.util.ConfigObject        | the application's configuration |
+| appConfig       | groovy.util.ConfigObject        | the application's configuration |
 | artifactManager | griffon.core.ArtifactManager    |                                 |
 | addonManager    | griffon.core.AddonManager       |                                 |
 | mvcGroupManager | griffon.core.MVCGroupManager    |                                 |
-| uiThreadManager | griffon.core.UIThreadManager    |                                 |
+| uiThreadManager | griffon.core.UIThreadManager    |                                 |
 
 Additionally, all Model, View, Controller classes will see their respective GriffonClass exposed
 following a naming convention. If the model class is `sample.SampleModel` then it's griffonClass
