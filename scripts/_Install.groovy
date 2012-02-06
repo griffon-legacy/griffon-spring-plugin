@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,4 @@
  * @author Andres Almiray
  */
 
-// check to see if we already have a SpringGriffonAddon
-configText = '''root.'SpringGriffonAddon'.addon=true'''
-if(!(builderConfigFile.text.contains(configText))) {
-    println 'Adding SpringGriffonAddon to Builder.groovy'
-    builderConfigFile.text += '\n' + configText + '\n'
-}
-
 ant.mkdir(dir: "${basedir}/src/spring")
-
-/*
-if(config.griffon.basic_injection.disable instanceof ConfigObject) {
-   configFile.append('''
-griffon.basic_injection.disable = true
-''')
-}
-*/

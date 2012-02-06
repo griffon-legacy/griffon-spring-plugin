@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,34 +18,32 @@
  * @author Andres Almiray
  */
 
-includeTargets << griffonScript("_GriffonCompile")
+includeTargets << griffonScript('_GriffonCompile')
 
 eventCompileEnd = {
     def spring = "${basedir}/src/spring"
     def springdir = new File(spring)
     if(!springdir.exists()) return
 
-    ant.mkdir(dir: classesDirPath)
+    ant.mkdir(dir: projectMainClassesDir)
 
-    if(sourcesUpToDate("${basedir}/src/spring", classesDirPath, ".groovy")) return
+    if(sourcesUpToDate(springdir, projectMainClassesDir, '.groovy')) return
 
-    ant.echo(message: "Compiling Spring resources to $classesDirPath")
-    String classpathId = "griffon.compile.classpath"
-    compileSources(classesDirPath, classpathId) {
+    ant.echo(message: "Compiling Spring resources to $projectMainClassesDir")
+    String classpathId = 'griffon.compile.classpath'
+    compileSources(projectMainClassesDir, classpathId) {
         src(path: spring)
         javac(classpathref: classpathId)
     }
 }
 
-sourcesUpToDate = { src, dest, srcsfx = ".java", destsfx = ".class" ->
-    def srcdir = new File(src)
-    def destdir = new File(dest)
+sourcesUpToDate = { src, dest, srcsfx = '.java', destsfx = '.class' ->
     def skipIt = new RuntimeException()
     try {
-        srcdir.eachFileRecurse { sf ->
+        src.eachFileRecurse { sf ->
             if(sf.isDirectory()) return
             if(!sf.toString().endsWith(srcsfx)) return
-            def target = new File(destdir.toString() + sf.toString().substring(srcdir.toString().length()) - srcsfx + destsfx)
+            def target = new File(dest.toString() + sf.toString().substring(src.toString().length()) - srcsfx + destsfx)
             if(!target.exists()) throw skipIt
             if(sf.lastModified() > target.lastModified()) throw skipIt
         }
@@ -54,17 +52,4 @@ sourcesUpToDate = { src, dest, srcsfx = ".java", destsfx = ".class" ->
        throw x
     }
     return true
-}
-
-def eventClosure1 = binding.variables.containsKey('eventSetClasspath') ? eventSetClasspath : {cl->}
-eventSetClasspath = { cl ->
-    eventClosure1(cl)
-    if(compilingPlugin('spring')) return
-    griffonSettings.dependencyManager.flatDirResolver name: 'griffon-spring-plugin', dirs: "${springPluginDir}/addon"
-    griffonSettings.dependencyManager.addPluginDependency('spring', [
-        conf: 'compile',
-        name: 'griffon-spring-addon',
-        group: 'org.codehaus.griffon.plugins',
-        version: springPluginVersion
-    ])
 }

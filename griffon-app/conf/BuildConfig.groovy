@@ -2,15 +2,11 @@ griffon.project.dependency.resolution = {
     inherits("global")
     log "warn"
     repositories {
-        griffonPlugins()
         griffonHome()
-        griffonCentral()
-
         mavenCentral()
         mavenRepo 'http://repository.springsource.com/maven/bundles/release'
     }
     dependencies {
-        def springVersion = '3.0.5.RELEASE'
         compile("org.springframework:org.springframework.aop:$springVersion",
                 "org.springframework:org.springframework.asm:$springVersion",
                 "org.springframework:org.springframework.aspects:$springVersion",
@@ -25,7 +21,7 @@ griffon.project.dependency.resolution = {
                 'aopalliance:aopalliance:1.0',
                 'org.aspectj:aspectjweaver:1.6.10',
                 'org.aspectj:aspectjrt:1.6.10',
-                'org.grails:grails-spring:1.3.6') {
+                'org.grails:grails-spring:1.3.7') {
             transitive = false 
         }
     }
@@ -39,4 +35,16 @@ griffon {
     }
 }
 
-griffon.jars.destDir='target/addon'
+log4j = {
+    // Example of changing the log pattern for the default console
+    // appender:
+    appenders {
+        console name: 'stdout', layout: pattern(conversionPattern: '%d [%t] %-5p %c - %m%n')
+    }
+
+    error 'org.codehaus.griffon',
+          'org.springframework',
+          'org.apache.karaf',
+          'groovyx.net'
+    warn  'griffon'
+}
