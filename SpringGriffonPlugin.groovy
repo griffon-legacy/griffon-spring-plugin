@@ -19,7 +19,7 @@
  */
 class SpringGriffonPlugin {
     // the plugin version
-    String version = '0.9'
+    String version = '0.9.1'
     // the version or versions of Griffon the plugin is designed for
     String griffonVersion = '0.9.5 > *'
     // the other plugins this plugin depends on
