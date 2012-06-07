@@ -31,7 +31,7 @@ eventCompileEnd = {
 
     ant.echo(message: "Compiling Spring resources to $projectMainClassesDir")
     String classpathId = 'griffon.compile.classpath'
-    compileSources(projectMainClassesDir, classpathId) {
+    compileProjectSources(griffonSettings.baseDir, projectMainClassesDir, classpathId) {
         src(path: spring)
         javac(classpathref: classpathId)
     }
