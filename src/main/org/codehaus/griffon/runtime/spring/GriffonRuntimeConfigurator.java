@@ -54,9 +54,9 @@ import java.util.Map;
  */
 public class GriffonRuntimeConfigurator implements ApplicationContextAware {
     public static final String BEAN_ID = "griffonConfigurator";
-    public static final String SPRING_RESOURCES_XML = "/spring/resources.xml";
-    public static final String SPRING_RESOURCES_GROOVY = "/spring/resources.groovy";
-    public static final String SPRING_RESOURCES_CLASS = "resources";
+    public static final String SPRING_RESOURCES_XML = "/spring/springbeans.xml";
+    public static final String SPRING_RESOURCES_GROOVY = "/spring/springbeans.groovy";
+    public static final String SPRING_RESOURCES_CLASS = "springbeans";
     public static final String MESSAGE_SOURCE_BEAN = "messageSource";
     public static final String EXCEPTION_HANDLER_BEAN = "exceptionHandler";
     public static final String CUSTOM_EDITORS_BEAN = "customEditors";
@@ -68,7 +68,7 @@ public class GriffonRuntimeConfigurator implements ApplicationContextAware {
     private GriffonApplication application;
     private ApplicationContext parent;
     private boolean loadExternalPersistenceConfig;
-    private static final String DEVELOPMENT_SPRING_RESOURCES_XML = "file:./griffon-app/conf/spring/resources.xml";
+    private static final String DEVELOPMENT_SPRING_RESOURCES_XML = "file:./griffon-app/conf/spring/springbeans.xml";
 
     public GriffonRuntimeConfigurator(GriffonApplication application) {
         this(application, null);
@@ -162,13 +162,13 @@ public class GriffonRuntimeConfigurator implements ApplicationContextAware {
     private void doPostResourceConfiguration(GriffonApplication application, RuntimeSpringConfiguration springConfig) {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         try {
-            Resource springResources;
+            Resource springbeans;
             ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
-            springResources = patternResolver.getResource(SPRING_RESOURCES_XML);
+            springbeans = patternResolver.getResource(SPRING_RESOURCES_XML);
 
-            if (springResources != null && springResources.exists()) {
-                LOG.debug("[RuntimeConfiguration] Configuring additional beans from " + springResources.getURL());
-                XmlBeanFactory xmlBf = new XmlBeanFactory(springResources);
+            if (springbeans != null && springbeans.exists()) {
+                LOG.debug("[RuntimeConfiguration] Configuring additional beans from " + springbeans.getURL());
+                XmlBeanFactory xmlBf = new XmlBeanFactory(springbeans);
                 xmlBf.setBeanClassLoader(classLoader);
                 String[] beanNames = xmlBf.getBeanDefinitionNames();
                 LOG.debug("[RuntimeConfiguration] Found [" + beanNames.length + "] beans to configure");
@@ -205,7 +205,7 @@ public class GriffonRuntimeConfigurator implements ApplicationContextAware {
     private static volatile BeanBuilder springGroovyResourcesBeanBuilder = null;
 
     /**
-     * Attempt to load the beans defined by a BeanBuilder DSL closure in "resources.groovy"
+     * Attempt to load the beans defined by a BeanBuilder DSL closure in "springbeans.groovy"
      *
      * @param config
      * @param classLoader
@@ -239,7 +239,7 @@ public class GriffonRuntimeConfigurator implements ApplicationContextAware {
                 loadBeansFromScript(config, groovySpringResourcesClass);
             } catch (Exception ex) {
                 // GriffonUtil.deepSanitize(ex);
-                LOG.error("[RuntimeConfiguration] Unable to load beans from resources.groovy", ex);
+                LOG.error("[RuntimeConfiguration] Unable to load beans from springbeans.groovy", ex);
             }
         } else {
             if(!springGroovyResourcesBeanBuilder.getSpringConfig().equals(config)) {

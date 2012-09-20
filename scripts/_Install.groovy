@@ -19,3 +19,13 @@
  */
 
 ant.mkdir(dir: "${basedir}/src/spring")
+
+ant.move(file: "${basedir}/src/spring/resources.groovy"
+       tofile: "${basedir}/src/spring/springbeans.groovy",
+       failonerror: false)
+ant.move(file: "${basedir}/src/spring/resources.xml"
+       tofile: "${basedir}/src/spring/springbeans.xml",
+       failonerror: false)
+ant.move(file: "${basedir}/griffon-app/conf/spring/resources.xml"
+       tofile: "${basedir}/griffon-app/conf/spring/springbeans.xml",
+       failonerror: false)
