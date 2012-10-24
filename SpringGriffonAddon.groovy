@@ -15,32 +15,31 @@
  */
 
 import grails.spring.BeanBuilder
-
-import griffon.core.GriffonClass
-import griffon.core.GriffonAddon
-import griffon.core.GriffonService
-import griffon.core.GriffonApplication
-import griffon.core.UIThreadManager
 import griffon.spring.ApplicationContextHolder
-import griffon.spring.factory.support.GriffonApplicationFactoryBean
 import griffon.spring.factory.support.ObjectFactoryBean
+import org.codehaus.griffon.runtime.core.SpringServiceArtifactHandler
+import org.codehaus.griffon.runtime.spring.DefaultRuntimeSpringConfiguration
 import org.codehaus.griffon.runtime.spring.GriffonApplicationContext
 import org.codehaus.griffon.runtime.spring.GriffonRuntimeConfigurator
-import org.codehaus.griffon.runtime.spring.DefaultRuntimeSpringConfiguration
-import org.codehaus.griffon.runtime.core.SpringServiceArtifactHandler
+import org.codehaus.groovy.grails.commons.spring.RuntimeSpringConfiguration
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
+import org.springframework.context.ApplicationContext
+
+import static org.codehaus.griffon.runtime.spring.GriffonRuntimeConfigurator.loadSpringGroovyResourcesIntoContext
 
 /**
  * @author Andres Almiray
  */
 class SpringGriffonAddon {
+    private BeanBuilder beanBuilder
+
     void addonInit(GriffonApplication app) {
-        GriffonApplicationContext rootAppCtx = new GriffonApplicationContext()        
+        GriffonApplicationContext rootAppCtx = new GriffonApplicationContext()
         rootAppCtx.refresh()
-        def configurator = new GriffonRuntimeConfigurator(app, rootAppCtx)
-        def springConfig = new DefaultRuntimeSpringConfiguration(rootAppCtx, app.class.classLoader)
-        def bb = new BeanBuilder(rootAppCtx, app.class.classLoader)
-        bb.beans {
+        GriffonRuntimeConfigurator configurator = new GriffonRuntimeConfigurator(app, rootAppCtx)
+        RuntimeSpringConfiguration springConfig = new DefaultRuntimeSpringConfiguration(rootAppCtx, app.class.classLoader)
+        beanBuilder = new BeanBuilder(rootAppCtx, app.class.classLoader)
+        beanBuilder.beans {
             'application'(ObjectFactoryBean) {
                 object = app
                 objectClass = GriffonApplication
@@ -76,9 +75,9 @@ class SpringGriffonAddon {
             app.artifactManager.controllerClasses.each(registerClass)
             app.artifactManager.viewClasses.each(registerClass)
         }
-        bb.registerBeans(springConfig)
-        GriffonRuntimeConfigurator.loadSpringGroovyResourcesIntoContext(springConfig, app.class.classLoader, rootAppCtx)
-        def applicationContext = configurator.configure(springConfig)
+        beanBuilder.registerBeans(springConfig)
+        loadSpringGroovyResourcesIntoContext(springConfig, app, rootAppCtx)
+        ApplicationContext applicationContext = configurator.configure(springConfig)
         ApplicationContextHolder.applicationContext = applicationContext
         app.metaClass.applicationContext = applicationContext
 
@@ -91,7 +90,7 @@ class SpringGriffonAddon {
         NewInstance: { klass, type, instance ->
             app.applicationContext.getAutowireCapableBeanFactory()
                 .autowireBeanProperties(instance, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false)
-            if(type == 'service') app.addApplicationEventListener(instance)
+            if (type == 'service') app.addApplicationEventListener(instance)
         },
         LoadAddonsEnd: { app, addons ->
             app.event('WithSpringStart', [app, app.applicationContext])
@@ -109,33 +108,25 @@ class SpringGriffonAddon {
         def target = addon instanceof GriffonAddon ? addon : addon.addonDelegate
         def addonMetaClass = target.metaClass
         def doWithSpring = addonMetaClass.getMetaProperty('doWithSpring')
-        if(doWithSpring) {
+        if (doWithSpring) {
             def beans = target.getProperty('doWithSpring')
-            if(beans instanceof Closure) {
+            if (beans instanceof Closure) {
                 registerBeans(app.applicationContext, beans)
             }
-        } 
+        }
     }
 
-    private registerBeans(Closure beans) {
-        def appCtx = new GriffonApplicationContext()
-        appCtx.refresh()
-        registerBeans(appCtx, beans)
-    }
-
-    private registerBeans(appCtx, Closure beans) {
-        def beanBuilder = new BeanBuilder(appCtx, app.class.classLoader)
+    private registerBeans(ApplicationContext appCtx, Closure beans) {
         beanBuilder.beans(beans)
         beanBuilder.registerBeans(appCtx)
-        beanBuilder.createApplicationContext()
     }
 
     private void springReady(addon) {
         try {
             def target = addon instanceof GriffonAddon ? addon : addon.addonDelegate
             target.whenSpringReady(app)
-        } catch(MissingMethodException mme) {
-            if(mme.method != 'whenSpringReady') throw mme
+        } catch (MissingMethodException mme) {
+            if (mme.method != 'whenSpringReady') throw mme
         }
     }
 }

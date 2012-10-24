@@ -19,7 +19,7 @@
  */
 class SpringGriffonPlugin {
     // the plugin version
-    String version = '1.1.1'
+    String version = '1.1.2'
     // the version or versions of Griffon the plugin is designed for
     String griffonVersion = '1.1.0 > *'
     // the other plugins this plugin depends on
@@ -54,9 +54,15 @@ Enables the usage of the [Spring framework][1] as Dependency Injection provider,
 Usage
 -----
 The Spring plugin will manage all relationships between artifacts by autowiring them by name.
-It relies on [Grail's BeanBuilder][2] to get the job done. You may place additional beans to
+It relies on [Grail's BeanBuilder][2] to get the job done. You may define additional beans to
 be wired in a script named `springbeans.groovy` and place it under `src/spring`. This script
-should contain bean definitions as expected by BeanBuilder.
+should contain bean definitions as expected by BeanBuilder. A trivial exmaple follows
+
+__src/spring/springbeans.groovy__
+
+    beans = {
+         sample(sample.SampleBean)
+    }
 
 You can also create addons that are Spring aware. Follow these steps to create such an addon
 
@@ -71,7 +77,7 @@ You can also create addons that are Spring aware. Follow these steps to create s
 3. Edit your plugin's descriptor by declaring a dependency on the spring plugin
 
         class FooGriffonPlugin {
-            Map dependsOn = [spring: '1.0']
+            Map dependsOn = [spring: '1.1.0']
             ...
         }
 
@@ -122,7 +128,7 @@ The following events will be triggered by this addon
  * WithSpringStart[app, applicationContext] - triggered before bean contributions from addons are processed
  * WithSpringEnd[app, applicationContext] - triggered after bean contributions from addons have been processed
  * WhenSpringReadyStart[app, applicationContext] - triggered before addons tweak the applicationContext
- * WhenSpringReadyEnd[app, applicationContext] - triggered after addons have had a chance to tweak the applicationContext
+ * WhenSpringReadyEnd[app, applicationContext] - triggered after addons have had their chance to tweak the applicationContext
 
 
 [1]: http://www.springframework.org

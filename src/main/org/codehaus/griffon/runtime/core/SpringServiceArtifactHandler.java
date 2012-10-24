@@ -17,19 +17,19 @@
 package org.codehaus.griffon.runtime.core;
 
 import griffon.core.*;
-import java.util.Map;
-import java.util.Collections;
 import griffon.spring.ApplicationContextHolder;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * @author Andres Almiray
  */
-class SpringServiceArtifactHandler extends SpringArtifactHandlerAdapter {
+public class SpringServiceArtifactHandler extends SpringArtifactHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(SpringServiceArtifactHandler.class);
-    private final ServiceManager serviceManager;
 
     private class SpringServiceManager extends AbstractServiceManager {
         public SpringServiceManager(GriffonApplication app) {
@@ -41,14 +41,14 @@ class SpringServiceArtifactHandler extends SpringArtifactHandlerAdapter {
         }
 
         public GriffonService findService(String name) {
-            if(!name.endsWith(GriffonServiceClass.TRAILING)) name += GriffonServiceClass.TRAILING;
+            if (!name.endsWith(GriffonServiceClass.TRAILING)) name += GriffonServiceClass.TRAILING;
             return (GriffonService) ApplicationContextHolder.getApplicationContext().getBean(name);
         }
     }
-    
-    SpringServiceArtifactHandler(GriffonApplication app) {
+
+    public SpringServiceArtifactHandler(GriffonApplication app) {
         super(app, GriffonServiceClass.TYPE, GriffonServiceClass.TRAILING);
-        serviceManager = new SpringServiceManager(app);
+        ServiceManager serviceManager = new SpringServiceManager(app);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Registering " + serviceManager + " as ServiceManager.");
         }

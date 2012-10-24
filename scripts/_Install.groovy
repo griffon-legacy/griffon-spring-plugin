@@ -34,6 +34,6 @@ def configFile = new File(basedir, 'griffon-app/conf/Config.groovy')
 if (configFile.exists()) {
     def configText = configFile.text
     if (!configText.contains('griffon.services.basic.disabled')) {
-        configFile.append '''\ngriffon.services.basic.disabled = true'\n'''
+        configFile.append '''\ngriffon.services.basic.disabled = true\n'''
     }
 }
