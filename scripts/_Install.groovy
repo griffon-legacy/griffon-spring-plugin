@@ -30,6 +30,14 @@ ant.move(file: "${basedir}/griffon-app/conf/spring/resources.xml",
     tofile: "${basedir}/griffon-app/conf/spring/springbeans.xml",
     failonerror: false)
 
+File springbeans = new File("${basedir}/src/spring/springbeans.groovy")
+if (!springbeans.exists()) {
+    springbeans.append('''
+beans = {
+
+}''')
+}
+
 def configFile = new File(basedir, 'griffon-app/conf/Config.groovy')
 if (configFile.exists()) {
     def configText = configFile.text

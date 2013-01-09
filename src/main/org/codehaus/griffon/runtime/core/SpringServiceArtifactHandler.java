@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Andres Almiray
@@ -32,17 +33,24 @@ public class SpringServiceArtifactHandler extends SpringArtifactHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(SpringServiceArtifactHandler.class);
 
     private class SpringServiceManager extends AbstractServiceManager {
+        private final Map<String, GriffonService> serviceInstances = new ConcurrentHashMap<String, GriffonService>();
+
         public SpringServiceManager(GriffonApplication app) {
             super(app);
         }
 
         public Map<String, GriffonService> getServices() {
-            return Collections.unmodifiableMap(ApplicationContextHolder.getApplicationContext().getBeansOfType(GriffonService.class));
+            return Collections.unmodifiableMap(serviceInstances);
         }
 
-        public GriffonService findService(String name) {
-            if (!name.endsWith(GriffonServiceClass.TRAILING)) name += GriffonServiceClass.TRAILING;
-            return (GriffonService) ApplicationContextHolder.getApplicationContext().getBean(name);
+        protected GriffonService doFindService(String name) {
+            return serviceInstances.get(name);
+        }
+
+        protected GriffonService doInstantiateService(String name) {
+            GriffonService service = (GriffonService) ApplicationContextHolder.getApplicationContext().getBean(name);
+            serviceInstances.put(name, service);
+            return service;
         }
     }
 
@@ -57,5 +65,10 @@ public class SpringServiceArtifactHandler extends SpringArtifactHandlerAdapter {
 
     protected GriffonClass newGriffonClassInstance(Class clazz) {
         return new DefaultGriffonServiceClass(getApp(), clazz);
+    }
+
+    public void registerArtifacts() {
+        registerGriffonClasses();
+        registerInstances(true);
     }
 }

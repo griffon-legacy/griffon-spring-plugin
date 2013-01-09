@@ -19,9 +19,9 @@
  */
 class SpringGriffonPlugin {
     // the plugin version
-    String version = '1.1.2'
+    String version = '1.2.0'
     // the version or versions of Griffon the plugin is designed for
-    String griffonVersion = '1.1.0 > *'
+    String griffonVersion = '1.2.0 > *'
     // the other plugins this plugin depends on
     Map dependsOn = [:]
     // resources that are included in plugin packaging
@@ -77,7 +77,7 @@ You can also create addons that are Spring aware. Follow these steps to create s
 3. Edit your plugin's descriptor by declaring a dependency on the spring plugin
 
         class FooGriffonPlugin {
-            Map dependsOn = [spring: '1.1.0']
+            Map dependsOn = [spring: '1.2.0']
             ...
         }
 

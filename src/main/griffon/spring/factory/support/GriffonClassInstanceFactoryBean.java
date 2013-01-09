@@ -25,13 +25,25 @@ import org.springframework.beans.factory.FactoryBean;
 public class GriffonClassInstanceFactoryBean implements FactoryBean {
     private GriffonClass griffonClass;
     private boolean singleton = true;
+    private boolean objectIsSingleton = false;
+    private Object objectInstance;
 
     public void setGriffonClass(GriffonClass griffonClass) {
         this.griffonClass = griffonClass;
     }
 
     public Object getObject() throws Exception {
-        return griffonClass != null ? griffonClass.newInstance() : null;
+        return griffonClass != null ? getObjectInstance() : null;
+    }
+
+    private Object getObjectInstance() {
+        if(objectIsSingleton) {
+            if(objectInstance == null) {
+                objectInstance = griffonClass.newInstance();
+            }
+            return objectInstance;
+        }
+        return griffonClass.newInstance();
     }
 
     public Class getObjectType() {
@@ -44,5 +56,9 @@ public class GriffonClassInstanceFactoryBean implements FactoryBean {
 
     public void setSingleton(boolean singleton) {
         this.singleton = singleton;
+    }
+
+    public void setObjectIsSingleton(boolean objectIsSingleton) {
+        this.objectIsSingleton = objectIsSingleton;
     }
 }

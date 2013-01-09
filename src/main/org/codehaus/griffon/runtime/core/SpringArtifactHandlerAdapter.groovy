@@ -67,7 +67,7 @@ abstract class SpringArtifactHandlerAdapter extends ArtifactHandlerAdapter {
         }
     }
 
-    protected void registerInstances() {
+    protected void registerInstances(boolean treatObjectAsSingleton = false) {
         LOG.trace("Registering bean instances for ${this.class.name}")
         doWithBeanBuilder(app) { 
             classes.each { GriffonClass targetGriffonClass ->
@@ -76,6 +76,7 @@ abstract class SpringArtifactHandlerAdapter extends ArtifactHandlerAdapter {
                     bean.scope = 'singleton'
                     bean.autowire = 'byName'
                     griffonClass = targetGriffonClass
+                    objectIsSingleton = treatObjectAsSingleton
                 }
             }
         }
