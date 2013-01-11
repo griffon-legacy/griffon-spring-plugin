@@ -8,7 +8,7 @@ griffon.project.dependency.resolution = {
     }
     dependencies {
         compile("org.springframework:org.springframework.aop:$springVersion",
-                "org.springframework:org.springframework.asm:$springVersion",
+                /*"org.springframework:org.springframework.asm:$springVersion",*/
                 "org.springframework:org.springframework.aspects:$springVersion",
                 "org.springframework:org.springframework.core:$springVersion",
                 "org.springframework:org.springframework.beans:$springVersion",
