@@ -3,25 +3,25 @@ griffon.project.dependency.resolution = {
     log "warn"
     repositories {
         griffonHome()
-        mavenCentral()
+        jcenter()
         mavenRepo 'http://repository.springsource.com/maven/bundles/release'
     }
     dependencies {
-        compile("org.springframework:org.springframework.aop:$springVersion",
+        compile("org.springframework:spring-aop:$springVersion",
                 /*"org.springframework:org.springframework.asm:$springVersion",*/
-                "org.springframework:org.springframework.aspects:$springVersion",
-                "org.springframework:org.springframework.core:$springVersion",
-                "org.springframework:org.springframework.beans:$springVersion",
-                "org.springframework:org.springframework.context:$springVersion",
-                "org.springframework:org.springframework.context.support:$springVersion",
-                "org.springframework:org.springframework.expression:$springVersion",
-                "org.springframework:org.springframework.transaction:$springVersion",
-                "org.springframework:org.springframework.instrument:$springVersion",
+                "org.springframework:spring-aspects:$springVersion",
+                "org.springframework:spring-core:$springVersion",
+                "org.springframework:spring-beans:$springVersion",
+                "org.springframework:spring-context:$springVersion",
+                "org.springframework:spring-context-support:$springVersion",
+                "org.springframework:spring-expression:$springVersion",
+                "org.springframework:spring-tx:$springVersion",
+                "org.springframework:spring-instrument:$springVersion",
                 'cglib:cglib-nodep:2.2',
                 'aopalliance:aopalliance:1.0',
                 'org.aspectj:aspectjweaver:1.6.10',
                 'org.aspectj:aspectjrt:1.6.10',
-                'org.grails:grails-spring:1.3.7') {
+                'org.grails:grails-spring:2.3.7') {
             transitive = false 
         }
     }

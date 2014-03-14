@@ -19,9 +19,9 @@
  */
 class SpringGriffonPlugin {
     // the plugin version
-    String version = '1.2.0'
+    String version = '1.4.0'
     // the version or versions of Griffon the plugin is designed for
-    String griffonVersion = '1.2.0 > *'
+    String griffonVersion = '1.5.0 > *'
     // the other plugins this plugin depends on
     Map dependsOn = [:]
     // resources that are included in plugin packaging
@@ -42,6 +42,7 @@ class SpringGriffonPlugin {
 
     List authors = [
         [
+            id: 'aalmiray',
             name: 'Andres Almiray',
             email: 'aalmiray@yahoo.com'
         ]
